@@ -43,4 +43,7 @@
 	- TCP是一种面向连接的单播协议,	在发送数据时通信双方必须建立一条连接
 	链接就是服务器和客户端保存的关于对方的信息
 	- TCP提供一种可靠,面向连接,字节流的传输层服务,采用三次握手建立连接,四次挥手断开连接
-
+- TCP的拥塞控制
+	- https://www.cnblogs.com/losbyday/p/5847041.html
+- TCP的流量控制
+	- https://www.cnblogs.com/newwy/p/3254029.html
