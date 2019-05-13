@@ -562,6 +562,97 @@ TreeNode* getNext(TreeNode *pNode) {
 }
 ```
 
+## 将二叉树打印成多行
+- 使用两个变量存放当前行以及下一行
+```
+std::vector<std::vector<int> > Print(TreeNode* pRoot) {
+	std::vector<std::vetor<int> > res;
+	std::vector<int> tmp;
+	if(pRoot == nullptr) {
+		return res;
+	}
+
+	int thisNum = 1;
+	int nextNum = 0;
+	std::queue<TreeNode*> q;
+	q.push(pRoot);
+
+	while(!q.empty()) {
+		TreeNode *node = q.front();
+		q.pop();
+		tmp.push_back(node->val);
+
+		if(node->left) {
+			q.push(node->left);
+			++nextNum;
+		}
+
+		if(node->right) {
+			q.push(node->right);
+			++nextNum;
+		}
+
+		if(--thisNum == 0) {
+			thisNum = nextNum;
+			nextNum = 0;
+			res.push_back(tmp);
+			tmp.clear();
+		}
+	}
+
+	return res;
+}
+```
+
+## 按之字形打印二叉树
+- 使用两个栈
+
+```
+std::vector<std::vector<int> > Print(TreeNode *root) {
+	std::vector<std::vector<int> > res;
+	if(root == nullptr) {
+		return res;
+	}
+
+	std::stack<TreeNode*> leves[2];
+	std::vector<int> tmp;
+	int cur = 0, next = 1;
+
+	leves[cur].push(root);
+	while(!level[cur].empty() || !level[next].empty()) {
+		TreeNode *node = level[cur].top();
+		level[cur].pop();
+		tmp.push_back(node->val);
+
+		if(cur == 0) {
+			if(node->left) {
+				level[next].push(node->left);
+			}
+			if(node->right) {
+				level[next].push(node->right);
+			}
+		} else {
+			if(node->left) {
+				level[next].push(node->right);
+			}
+			if(node->left) {
+				level[next].push(node->left);
+			}
+		}
+
+		if(level[cur].empty()) {
+			res.push_back(tmp);
+			tmp.clear();
+			next = 1 - next;
+			cur = 1 - cur;
+		}
+	}
+
+	retrun res;
+}
+```
+
+
 ## 矩阵中的路径
 - 回朔法
 
