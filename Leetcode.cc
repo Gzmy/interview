@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <stack>
 #include <map>
 #include <unordered_set>
 #include <unordered_map>
@@ -434,3 +435,210 @@ int lengthOfLongestSubstring(std::string s) {
 	return res;
 }
 
+
+// 递增的三元子序列， 遍历一次
+bool increasingTriplet(std::vector<int>& nums) {
+	if(nums.size() < 3) {
+		return false;
+	}
+
+	std::vector<int> res;
+	res.push_back(nums[0]);
+
+	for(size_t i = 1; i < nums.size(); ++i) {
+		if(nums[i] > res.back()) {
+			res.push_back(nums[i]);
+			if(nums.size() == 3) {
+				return true;
+			}
+		} else if (nums[i] < res[0]) {
+			res[0] = nums[i];
+		}
+
+		if(nums.size() == 2 && nums[i] > res[0] && nums[i] < res[1]) {
+			res[1] = nums[i];
+		}
+	}
+
+	return false;
+}
+
+// 二叉搜素书中第K小的元素
+
+// static void inOrder(TreeNode *root, std::vector<int>& res) {
+// 	if(!root) {
+// 		return;
+// 	}
+// 
+// 	inOrder(root->left, res);
+// 	res.push_back(root->val);
+// 	inOrder(root->right, res);
+// }
+// 
+// int kthSmallest(TreeNode* root, int k) {
+// 	if(!root || k <= 0) {
+// 		return 0;
+// 	}
+// 
+// 	std::vector<int> res;
+// 	inOrder(root, res);
+// 
+// 	return res[k-1];
+// }
+// 迭代
+int kthSmallest(TreeNode* root, int k) {
+	if(!root || k <= 0) {
+		return 0;
+	}
+
+	std::stack<TreeNode*> s;
+	std::vector<int> res;
+
+	while(root || !s.empty()) {
+		while(root) {
+			s.push(root);
+			root = root->left;
+		}
+
+		TreeNode *top = s.top();
+		s.pop();
+		res.push_back(top->val);
+		if((int)res.size() == k) {
+			break;
+		}
+		root = top->right;
+	}
+
+	return res[k-1];
+}
+
+
+struct Node {
+	int val;
+	Node* left;
+	Node* right;
+	Node* next;
+
+	Node() {}
+
+	Node(int _val, Node* _left, Node* _right, Node* _next) {
+		val = _val;
+		left = _left;
+		right = _right;
+		next = _next;
+
+	}
+};
+
+// 给定一个完美二叉树, 填充每个节点的下一个右侧结点
+// 使用递归
+Node *connect(Node *root) {
+	if(!root) {
+		return root;
+	}
+
+	if(root->left) {
+		root->left->next = root->right;
+	}
+
+	if(root->right) {
+		root->right->next = root->next ? root->next->left : NULL;
+	}
+
+	connect(root->left);
+	connect(root->right);
+
+	return root;
+}
+
+
+// 零钱兑换 
+// 输入: coins = [1, 2, 5], amount = 11
+// 输出: 3 
+// 解释: 11 = 5 + 5 + 1
+
+int coinChange(std::vector<int>& coins, int amount) {
+	if(coins.empty() || amount <= 0) {
+		return 0;
+	}
+
+	std::vector<int> dp(amount+1, amount+1);
+	int size = coins.size();
+	dp[0] = 0;
+
+	for(int i = 1; i <= amount; ++i) {
+		for(int j = 0; j < size; ++j) {
+			if(i < coins[j]) {
+				continue;
+			}
+
+			dp[i] = std::min(dp[i], dp[i-coins[j]]+1);
+		}
+	}
+	if(dp[amount] > amount) {
+		return -1;
+	}
+
+	return dp[amount];
+}
+
+// Longest Increasing Subsequence
+int lengthOfLIS(std::vector<int>& nums) {
+	if(nums.empty()) {
+		return 0;
+	}
+	std::vector<int> dp(nums.size(), 1);
+	int res = 1;
+
+	for(size_t i = 0; i < nums.size(); ++i) {
+		for(size_t j = 0; j < i; ++j) {
+			if(nums[i] > nums[j]) {
+				dp[i] = std::max(dp[i], dp[j]+1);
+				res = std::max(res, dp[i]);
+			}
+		}
+	}
+
+	return res;
+}
+
+// 最长公共子串
+int findLongest(std::string A, int n, std::string B, int m) {
+	if(n <= 0 || m <= 0) {
+		return 0;
+	}
+
+	std::vector<std::vector<int>> dp(n, std::vector<int>(m, 0));
+	int res = 0;
+
+	// init row
+	for(int i = 0; i < m; ++i) {
+		if(A[0] == B[i]) {
+			dp[0][i] = 1;
+		}
+	}
+
+	for(int i = 0; i < n; ++i) {
+		if(A[i] == B[0]) {
+			dp[i][0] = 1;
+		}
+	}
+
+	for(int i = 1; i < n; ++i) {
+		for(int j = 1; j < m; ++j) {
+			if(A[i] == B[j]) {
+				dp[i][j] = dp[i-1][j-1] + 1;
+				res = std::max(res, dp[i][j]);
+			}
+		}
+	}
+
+	return res;
+}
+
+int main()
+{
+	std::vector<int> vec{1, 2, 5};
+	std::cout << coinChange(vec, 11) << std::endl;
+	return 0;
+}
