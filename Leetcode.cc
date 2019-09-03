@@ -636,6 +636,54 @@ int findLongest(std::string A, int n, std::string B, int m) {
 	return res;
 }
 
+// 二查搜索树与双向链表
+void convert(TreeNode *cur, TreeNode *&pre) {
+	if(!cur) {
+		return;
+	}
+
+	convert(cur->left, pre);
+
+	cur->left = pre;
+	if(pre) {
+		pre->right = cur;
+	}
+	pre = cur;
+
+	convert(cur->right, pre);
+}
+
+TreeNode *Convert(TreeNode *root) {
+	if(!root) {
+		return root;
+	}
+
+	TreeNode *pre = nullptr;
+	convert(root, pre);
+
+	TreeNode *res = root;
+	while(res->left) {
+		res = res->left;
+	}
+
+	return res;
+}
+
+// 字符串的排列
+std::vector<std::string> Permutation(std::string str) {
+	std::vector<std::string> res;
+	if(str.empty()) {
+		return res;
+	}
+
+	std::sort(str.begin(), str.end());
+	do {
+		res.push_back(str);
+	} while(std::next_permutation(str.begin(), str.end()));
+
+	return res;
+}
+
 int main()
 {
 	std::vector<int> vec{1, 2, 5};
