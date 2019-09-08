@@ -353,6 +353,160 @@
     }
     ```
 
+- C++实现单列模式
+	- 饿汉模式: 不管如何，只要已启动就加载
+	```
+	class Singleton {
+	private:
+		static Singleton cur;
+
+		Singleton() = delete;
+		Singleton(const Singleton&) = delete;
+		Singleton& operator=(const Singleton&) = delete;
+
+	public:
+		static Singleton* getSing() {
+			return &cur;
+		}
+	};
+	
+	Singleton Singleton::cur;
+	```
+
+	- 懒汉模式， 等到有需要时再加载, 注意加双锁
+
+- 使用C++模拟实现智能指针
+	- auto_prt
+	```
+	template<class T>
+	class auto_ptr {
+	private:
+		T *_ptr;
+	public:
+		auto_ptr(T *ptr = nullptr) : _ptr(ptr) {}
+
+		auto_ptr(auto_ptr<T>& ap) : _prt(ap._ptr){
+			ap._ptr = nullptr;
+		}
+
+		auto_ptr<T>& operator=(auto_ptr<T>& ap) {
+			if(this != &ap) {
+				if(_ptr) {
+					delete _ptr;
+				}
+
+				_ptr = ap._ptr;
+				ap._ptr = nullptr;
+			}
+
+			return *this;
+		}
+
+		T& operator*() {
+			return *_ptr;
+		}
+
+		T* operator->() {
+			return _prt;
+		}
+
+		~auto_ptr() {
+			if(_ptr) {
+				delete _ptr;
+			}
+		}
+	}
+	```
+	- unique_ptr
+	```
+	template<class T>
+	class unique_ptr {
+	private:
+		T *_ptr;
+
+		unique_ptr(unique_ptr<T>& ) = delete;
+		unique_ptr<T>& operator=(unique_ptr<T>& ) = delete;
+	public:
+		unique_ptr(T *ptr = nullptr) : _ptr(ptr) {}
+
+		T* operator->() {
+			return _ptr;
+		}
+
+		T& operator*() {
+			return *_ptr;
+		}
+	};
+	```
+	- shared_ptrq
+	```
+	template<class T>
+	class shared_ptr {
+	private:
+		int *_count;
+		T *_ptr;
+
+	public:
+		shared_ptr(T *ptr = nullptr)
+			 : _ptr(ptr)
+			 , _count(new int(1))
+		{
+			if (_ptr == nullptr) {
+				*_count = 0;
+			}
+		}
+
+		shared_ptr(const shared_ptr<T>& sp)
+			 : _ptr(sp._ptr)
+			 , _count(sp._count)
+		{
+			if(_ptr) {
+				++(*_count);
+			}
+		}
+
+		~shared_ptr() {
+			if(_ptr && --(*_count) == 0) {
+				delete _ptr;
+				delete _count;
+			}
+		}
+
+		shared_ptr<T>& operator=(const shared_ptr<T>& sp) {
+			if(this != &sp) {
+				if(_ptr && --(*_count) == 0) {
+					delete _ptr;
+					delete _count;
+				}
+
+				_ptr = sp._ptr;
+				_count = sp._count;
+
+				if(_ptr) {
+					++(*_count);
+				}
+			}
+
+			return *this;
+		}
+
+		T* operator->() {
+			return _ptr;
+		}
+
+		T& operator*() {
+			return *_ptr;
+		}
+
+		int usr_count() {
+			return *_count;
+		}
+
+		T* getPtr() {
+			return _ptr;
+		}
+	};
+	```
     
 
 ## 操作系统
